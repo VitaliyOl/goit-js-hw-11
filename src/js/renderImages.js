@@ -11,7 +11,7 @@ export function imagesMarkup(images) {
         downloads,
       }) => {
         return `      
-          <div class="photo-card" >
+          <div class="photo-card" >          
           <a href="${largeImageURL}" alt="${tags}" >  
         <img src="${webformatURL}" alt="${tags}" loading="lazy" class='gallery__image'/>
         </a>
