@@ -1,9 +1,20 @@
 export function imagesMarkup(images) {
   return images
-    .map(({ webformatURL, tags, likes, views, comments, downloads }) => {
-      return `
-          <div class="photo-card">
-        <img src="${webformatURL}" alt="${tags}" loading="lazy" />
+    .map(
+      ({
+        largeImageURL,
+        webformatURL,
+        tags,
+        likes,
+        views,
+        comments,
+        downloads,
+      }) => {
+        return `      
+          <div class="photo-card" >
+          <a href="${largeImageURL}" alt="${tags}" >  
+        <img src="${webformatURL}" alt="${tags}" loading="lazy" class='gallery__image'/>
+        </a>
         <div class="info">
           <p class="info-item">
             <b>Likes : ${likes}</b>
@@ -19,7 +30,9 @@ export function imagesMarkup(images) {
           </p>
         </div>
       </div>
+      
           `;
-    })
+      }
+    )
     .join('');
 }
