@@ -6,7 +6,8 @@ export class ApiServices {
   constructor() {
     this.searchQuery = '';
     this.page = 1;
-    this.per_page = 40;
+    this.per_page = 140;
+    this.totalHits = 0;
   }
 
   async fetchImages() {
@@ -37,12 +38,20 @@ export class ApiServices {
     this.page = 1;
   }
 
+  total(total) {
+    this.totalHits = total;
+  }
+
   get query() {
     return this.searchQuery;
   }
 
   set query(newQuery) {
     this.searchQuery = newQuery;
+  }
+
+  limitPerHostImages() {
+    return this.page <= Math.ceil(this.totalHits / this.per_page);
   }
 }
 

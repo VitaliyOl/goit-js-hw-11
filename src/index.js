@@ -17,7 +17,6 @@ document.body.style.paddingTop = `${pageFormHeight}px`;
 refs.loadMoreBtn.style.visibility = 'hidden';
 
 const apiServices = new ApiServices();
-let currentPage = 0;
 
 let gallery = new SimpleLightbox('.photo-card a', {
   captionDelay: 250,
@@ -30,20 +29,21 @@ refs.loadMoreBtn.addEventListener('click', onMoreImages);
 async function onMoreImages() {
   apiServices.incrementPage();
 
-  const { hits } = await apiServices.fetchImages();
-
-  currentPage -= hits.length;
-
-  renderImages(hits);
-
-  gallery.refresh();
-
-  if (currentPage < 0) {
+  if (!apiServices.limitPerHostImages()) {
     refs.loadMoreBtn.style.visibility = 'hidden';
     Notify.failure(
       '"We re sorry, but you ve reached the end of search results."'
     );
     return;
+  }
+  try {
+    const { hits } = await apiServices.fetchImages();
+
+    renderImages(hits);
+
+    gallery.refresh();
+  } catch (error) {
+    Notify.failure('"Ups, something wrong!"');
   }
 }
 
@@ -53,16 +53,17 @@ async function onSubmit(e) {
   const { elements } = e.currentTarget;
   apiServices.query = elements.searchQuery.value.trim();
 
+  if (!apiServices.query) {
+    return Notify.failure(
+      '"Sorry, there are no images matching your search query. Please try again."'
+    );
+  }
   try {
-    if (!apiServices.query) {
-      return error;
-    }
-
     apiServices.resetPage();
 
     const { hits, total, totalHits } = await apiServices.fetchImages();
 
-    currentPage = totalHits - hits.length;
+    apiServices.total(totalHits);
 
     clearForm();
 
@@ -74,9 +75,7 @@ async function onSubmit(e) {
 
     Notify.success(`"Hooray! We found ${total} images."`);
   } catch (error) {
-    Notify.failure(
-      '"Sorry, there are no images matching your search query. Please try again."'
-    );
+    Notify.failure('"Ups, something wrong!"');
   }
 }
 // function scrollOn() {
