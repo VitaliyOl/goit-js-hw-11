@@ -11,6 +11,7 @@ export class ApiServices {
 
   async fetchImages() {
     const params = {
+      key: `${API_KEY}`,
       q: this.searchQuery,
       image_type: 'photo',
       orientation: 'horizontal',
@@ -19,13 +20,11 @@ export class ApiServices {
       page: this.page,
     };
 
-    const URL = `?key=${API_KEY}`;
-
-    const { data } = await axios(URL, { params });
+    const { data } = await axios({ params });
 
     return data;
 
-    // return await axios(`${API_KEY}${searchParams}`).then(response => {
+    // return await axios({params}).then(response => {
     //   return response;
     // });
   }
