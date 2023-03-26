@@ -18,6 +18,12 @@ refs.loadMoreBtn.style.visibility = 'hidden';
 
 const apiServices = new ApiServices();
 
+const options = {
+  root: null,
+  rootMargin: '100px',
+  threshold: 1.0,
+};
+
 let gallery = new SimpleLightbox('.photo-card a', {
   captionDelay: 250,
   captionsData: 'alt',
@@ -25,6 +31,27 @@ let gallery = new SimpleLightbox('.photo-card a', {
 
 refs.form.addEventListener('submit', onSubmit);
 refs.loadMoreBtn.addEventListener('click', onMoreImages);
+
+async function scrollOn(entries, observer) {
+  for (const entrie of entries) {
+    if (entrie.isIntersecting) {
+      apiServices.incrementPage();
+      if (apiServices.limitPerHostImages()) {
+        const { hits } = await apiServices.fetchImages();
+        renderImages(hits);
+      } else {
+        refs.loadMoreBtn.style.visibility = 'hidden';
+        Notify.failure(
+          '"We re sorry, but you ve reached the end of search results."'
+        );
+      }
+    }
+  }
+
+  observer.observe(refs.loadMoreBtn);
+}
+
+const observer = new IntersectionObserver(scrollOn, options);
 
 async function onMoreImages() {
   apiServices.incrementPage();
@@ -77,17 +104,9 @@ async function onSubmit(e) {
   } catch (error) {
     Notify.failure('"Ups, something wrong!"');
   }
-}
-// function scrollOn() {
-//   const { height: cardHeight } = document
-//     .querySelector('.gallery')
-//     .firstElementChild.getBoundingClientRect();
 
-//   window.scrollBy({
-//     top: cardHeight * 2,
-//     behavior: 'smooth',
-//   });
-// }
+  observer.observe(refs.loadMoreBtn);
+}
 
 function renderImages(images) {
   return refs.gallery.insertAdjacentHTML('beforeend', imagesMarkup(images));

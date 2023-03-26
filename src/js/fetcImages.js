@@ -6,7 +6,7 @@ export class ApiServices {
   constructor() {
     this.searchQuery = '';
     this.page = 1;
-    this.per_page = 140;
+    this.per_page = 20;
     this.totalHits = 0;
   }
 
